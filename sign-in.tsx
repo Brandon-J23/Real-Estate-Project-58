@@ -10,17 +10,64 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Home, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { supabase } from "./lib/supabase"
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle sign in logic here
-    console.log("Sign in:", { email, password, rememberMe })
+    setIsLoading(true)
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        console.error("Error signing in:", error.message)
+        alert("Error signing in: " + error.message)
+      } else {
+        console.log("Sign in successful:", data)
+        // Redirect to dashboard or home page
+        window.location.href = "/"
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error)
+      alert("An unexpected error occurred")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true)
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        console.error("Error signing in with Google:", error.message)
+        alert("Error signing in with Google: " + error.message)
+        setIsGoogleLoading(false)
+      }
+      // Note: If successful, user will be redirected, so we don't set loading to false
+    } catch (error) {
+      console.error("Unexpected error:", error)
+      alert("An unexpected error occurred")
+      setIsGoogleLoading(false)
+    }
   }
 
   return (
@@ -64,6 +111,7 @@ export default function SignIn() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="h-11"
+                  disabled={isLoading}
                 />
               </div>
 
@@ -78,6 +126,7 @@ export default function SignIn() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     className="h-11 pr-10"
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -85,6 +134,7 @@ export default function SignIn() {
                     size="icon"
                     className="absolute right-0 top-0 h-11 w-11"
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
@@ -97,6 +147,7 @@ export default function SignIn() {
                     id="remember"
                     checked={rememberMe}
                     onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                    disabled={isLoading}
                   />
                   <Label htmlFor="remember" className="text-sm text-gray-600">
                     Remember me
@@ -107,8 +158,8 @@ export default function SignIn() {
                 </Link>
               </div>
 
-              <Button type="submit" className="w-full h-11 bg-blue-600 hover:bg-blue-700">
-                Sign In
+              <Button type="submit" className="w-full h-11 bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
+                {isLoading ? "Signing In..." : "Sign In"}
               </Button>
             </form>
 
@@ -123,7 +174,12 @@ export default function SignIn() {
               </div>
 
               <div className="mt-6">
-                <Button className="w-full h-11 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 shadow-sm">
+                <Button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={isGoogleLoading || isLoading}
+                  className="w-full h-11 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 shadow-sm"
+                >
                   <svg className="h-5 w-5 mr-3" viewBox="0 0 24 24">
                     <path
                       fill="#4285F4"
@@ -142,7 +198,7 @@ export default function SignIn() {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     />
                   </svg>
-                  Continue with Google
+                  {isGoogleLoading ? "Connecting..." : "Continue with Google"}
                 </Button>
               </div>
             </div>

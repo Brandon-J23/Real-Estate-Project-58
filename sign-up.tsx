@@ -11,10 +11,13 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Home, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { supabase } from "./lib/supabase"
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,10 +34,70 @@ export default function SignUp() {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle sign up logic here
-    console.log("Sign up:", formData)
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords don't match")
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone,
+            user_type: formData.userType,
+            subscribe_newsletter: formData.subscribeNewsletter,
+          },
+        },
+      })
+
+      if (error) {
+        console.error("Error signing up:", error.message)
+        alert("Error signing up: " + error.message)
+      } else {
+        console.log("Sign up successful:", data)
+        alert("Sign up successful! Please check your email to verify your account.")
+        // Optionally redirect to sign-in page
+        // window.location.href = '/sign-in'
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error)
+      alert("An unexpected error occurred")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGoogleSignUp = async () => {
+    setIsGoogleLoading(true)
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        console.error("Error signing up with Google:", error.message)
+        alert("Error signing up with Google: " + error.message)
+        setIsGoogleLoading(false)
+      }
+      // Note: If successful, user will be redirected, so we don't set loading to false
+    } catch (error) {
+      console.error("Unexpected error:", error)
+      alert("An unexpected error occurred")
+      setIsGoogleLoading(false)
+    }
   }
 
   return (
@@ -78,6 +141,7 @@ export default function SignUp() {
                     onChange={(e) => handleInputChange("firstName", e.target.value)}
                     required
                     className="h-11"
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -89,6 +153,7 @@ export default function SignUp() {
                     onChange={(e) => handleInputChange("lastName", e.target.value)}
                     required
                     className="h-11"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -103,6 +168,7 @@ export default function SignUp() {
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
                   className="h-11"
+                  disabled={isLoading}
                 />
               </div>
 
@@ -116,12 +182,17 @@ export default function SignUp() {
                   onChange={(e) => handleInputChange("phone", e.target.value)}
                   required
                   className="h-11"
+                  disabled={isLoading}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="userType">I am a...</Label>
-                <Select value={formData.userType} onValueChange={(value) => handleInputChange("userType", value)}>
+                <Select
+                  value={formData.userType}
+                  onValueChange={(value) => handleInputChange("userType", value)}
+                  disabled={isLoading}
+                >
                   <SelectTrigger className="h-11">
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
@@ -145,6 +216,7 @@ export default function SignUp() {
                     onChange={(e) => handleInputChange("password", e.target.value)}
                     required
                     className="h-11 pr-10"
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -152,6 +224,7 @@ export default function SignUp() {
                     size="icon"
                     className="absolute right-0 top-0 h-11 w-11"
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
@@ -169,6 +242,7 @@ export default function SignUp() {
                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                     required
                     className="h-11 pr-10"
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -176,6 +250,7 @@ export default function SignUp() {
                     size="icon"
                     className="absolute right-0 top-0 h-11 w-11"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={isLoading}
                   >
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
@@ -189,6 +264,7 @@ export default function SignUp() {
                     checked={formData.agreeToTerms}
                     onCheckedChange={(checked) => handleInputChange("agreeToTerms", checked as boolean)}
                     className="mt-1"
+                    disabled={isLoading}
                   />
                   <Label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed">
                     I agree to the{" "}
@@ -207,6 +283,7 @@ export default function SignUp() {
                     id="newsletter"
                     checked={formData.subscribeNewsletter}
                     onCheckedChange={(checked) => handleInputChange("subscribeNewsletter", checked as boolean)}
+                    disabled={isLoading}
                   />
                   <Label htmlFor="newsletter" className="text-sm text-gray-600">
                     Subscribe to our newsletter for market updates and new listings
@@ -217,9 +294,9 @@ export default function SignUp() {
               <Button
                 type="submit"
                 className="w-full h-11 bg-blue-600 hover:bg-blue-700"
-                disabled={!formData.agreeToTerms}
+                disabled={!formData.agreeToTerms || isLoading}
               >
-                Create Account
+                {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
 
@@ -234,7 +311,12 @@ export default function SignUp() {
               </div>
 
               <div className="mt-6">
-                <Button className="w-full h-11 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 shadow-sm">
+                <Button
+                  type="button"
+                  onClick={handleGoogleSignUp}
+                  disabled={isGoogleLoading || isLoading}
+                  className="w-full h-11 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 shadow-sm"
+                >
                   <svg className="h-5 w-5 mr-3" viewBox="0 0 24 24">
                     <path
                       fill="#4285F4"
@@ -253,7 +335,7 @@ export default function SignUp() {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     />
                   </svg>
-                  Continue with Google
+                  {isGoogleLoading ? "Connecting..." : "Continue with Google"}
                 </Button>
               </div>
             </div>
