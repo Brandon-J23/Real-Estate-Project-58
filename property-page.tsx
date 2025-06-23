@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search, Home, TrendingUp, Users, Phone, Mail, Heart, Bed, Bath, Square } from "lucide-react"
+import Link from "next/link"
 
 export default function PropertyPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -93,12 +94,12 @@ export default function PropertyPage() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <div className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Home className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">PrimeRealty</span>
-            </div>
+            </Link>
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
@@ -118,10 +119,14 @@ export default function PropertyPage() {
 
             {/* CTA Buttons */}
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" className="text-gray-600">
-                Sign In
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700">Get Started</Button>
+              <Link href="/sign-in">
+                <Button variant="ghost" className="text-gray-600">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/sign-up">
+                <Button className="bg-blue-600 hover:bg-blue-700">Get Started</Button>
+              </Link>
             </div>
           </div>
         </div>
