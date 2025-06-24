@@ -3,7 +3,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from main import get_db, Property, check_property_data_complete
+from main_service.database import get_db, Property, check_property_data_complete
 from tasks import fetch_property_data
 from dotenv import load_dotenv
 load_dotenv()  # This looks for .env in the current working directory

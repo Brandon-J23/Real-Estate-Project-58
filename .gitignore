@@ -25,3 +25,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python environment
+__pycache__/
+*.pyc
+.env
+
+# VSCode settings
+.vscode/
+
+# virtual environments
+venv/
+.env/
