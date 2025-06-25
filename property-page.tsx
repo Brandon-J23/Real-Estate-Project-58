@@ -109,7 +109,7 @@ export default function PropertyPage() {
               <a href="#" className="text-blue-600 font-medium">
                 Buy
               </a>
-              <a href="#" className="text-gray-600 hover:text-blue-600 font-medium">
+              <a href="/sell" className="text-gray-600 hover:text-blue-600 font-medium">
                 Sell
               </a>
               <a href="#" className="text-gray-600 hover:text-blue-600 font-medium">
@@ -281,9 +281,11 @@ export default function PropertyPage() {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">{service.title}</h3>
                   <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
-                  <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
-                    {service.buttonText}
-                  </Button>
+                  <Link href="/sell">
+                    <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                      {service.buttonText}
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
