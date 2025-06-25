@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search, Home, TrendingUp, Users, Phone, Mail, Heart, Bed, Bath, Square } from "lucide-react"
 import Link from "next/link"
+import { useAuth } from "./hooks/useAuth"
+import { UserMenu } from "./components/user-menu"
 
 export default function PropertyPage() {
   const [searchQuery, setSearchQuery] = useState("")
+  const { user, loading } = useAuth()
 
   const quickLocations = ["New York", "Los Angeles", "Chicago", "Miami"]
 
@@ -117,16 +120,24 @@ export default function PropertyPage() {
               </a>
             </nav>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons / User Menu */}
             <div className="flex items-center space-x-3">
-              <Link href="/sign-in">
-                <Button variant="ghost" className="text-gray-600">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/sign-up">
-                <Button className="bg-blue-600 hover:bg-blue-700">Get Started</Button>
-              </Link>
+              {loading ? (
+                <div className="w-20 h-8 bg-gray-200 animate-pulse rounded"></div>
+              ) : user ? (
+                <UserMenu />
+              ) : (
+                <>
+                  <Link href="/sign-in">
+                    <Button variant="ghost" className="text-gray-600">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/sign-up">
+                    <Button className="bg-blue-600 hover:bg-blue-700">Get Started</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
