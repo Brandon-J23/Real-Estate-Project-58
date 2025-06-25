@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,10 +11,12 @@ import { Search, Home, TrendingUp, Users, Phone, Mail, Heart, Bed, Bath, Square 
 import Link from "next/link"
 import { useAuth } from "./hooks/useAuth"
 import { UserMenu } from "./components/user-menu"
+import { useRouter } from "next/navigation"
 
 export default function PropertyPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const { user, loading } = useAuth()
+  const router = useRouter()
 
   const quickLocations = ["New York", "Los Angeles", "Chicago", "Miami"]
 
@@ -90,6 +94,20 @@ export default function PropertyPage() {
     },
   ]
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
+    } else {
+      router.push("/search")
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch()
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -109,9 +127,9 @@ export default function PropertyPage() {
               <a href="#" className="text-blue-600 font-medium">
                 Buy
               </a>
-              <a href="/sell" className="text-gray-600 hover:text-blue-600 font-medium">
+              <Link href="/sell" className="text-gray-600 hover:text-blue-600 font-medium">
                 Sell
-              </a>
+              </Link>
               <a href="#" className="text-gray-600 hover:text-blue-600 font-medium">
                 Invest
               </a>
@@ -159,9 +177,10 @@ export default function PropertyPage() {
                 placeholder="Enter location, property type, or keyword..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
                 className="flex-1 h-12 text-base rounded-r-none border-r-0"
               />
-              <Button className="h-12 px-8 bg-blue-600 hover:bg-blue-700 rounded-l-none">
+              <Button onClick={handleSearch} className="h-12 px-8 bg-blue-600 hover:bg-blue-700 rounded-l-none">
                 <Search className="h-5 w-5 mr-2" />
                 Search Properties
               </Button>
@@ -171,7 +190,16 @@ export default function PropertyPage() {
           {/* Quick Location Buttons */}
           <div className="flex flex-wrap justify-center gap-3 mb-12">
             {quickLocations.map((location) => (
-              <Button key={location} variant="outline" size="sm" className="text-gray-600">
+              <Button
+                key={location}
+                variant="outline"
+                size="sm"
+                className="text-gray-600"
+                onClick={() => {
+                  setSearchQuery(location)
+                  router.push(`/search?q=${encodeURIComponent(location)}`)
+                }}
+              >
                 {location}
               </Button>
             ))}
@@ -221,9 +249,11 @@ export default function PropertyPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Featured Properties</h2>
               <p className="text-gray-600">Handpicked properties that offer exceptional value and quality</p>
             </div>
-            <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
-              View All Properties →
-            </Button>
+            <Link href="/search">
+              <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                View All Properties →
+              </Button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
