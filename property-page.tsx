@@ -228,35 +228,37 @@ export default function PropertyPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredProperties.map((property) => (
-              <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative">
-                  <div className="h-48 bg-gray-300"></div>
-                  {property.featured && (
-                    <Badge className="absolute top-3 left-3 bg-blue-600 hover:bg-blue-600">Featured</Badge>
-                  )}
-                  <Button variant="outline" size="icon" className="absolute top-3 right-3 bg-white/90 hover:bg-white">
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                </div>
-                <CardContent className="p-6">
-                  <div className="text-2xl font-bold text-blue-600 mb-2">${property.price.toLocaleString()}</div>
-                  <p className="text-gray-600 mb-4">{property.address}</p>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <Bed className="h-4 w-4 mr-1" />
-                      <span>{property.beds} beds</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Bath className="h-4 w-4 mr-1" />
-                      <span>{property.baths} baths</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Square className="h-4 w-4 mr-1" />
-                      <span>{property.sqft.toLocaleString()} sqft</span>
-                    </div>
+              <Link key={property.id} href={`/property/${property.id}`}>
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                  <div className="relative">
+                    <div className="h-48 bg-gray-300"></div>
+                    {property.featured && (
+                      <Badge className="absolute top-3 left-3 bg-blue-600 hover:bg-blue-600">Featured</Badge>
+                    )}
+                    <Button variant="outline" size="icon" className="absolute top-3 right-3 bg-white/90 hover:bg-white">
+                      <Heart className="h-4 w-4" />
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
+                  <CardContent className="p-6">
+                    <div className="text-2xl font-bold text-blue-600 mb-2">${property.price.toLocaleString()}</div>
+                    <p className="text-gray-600 mb-4">{property.address}</p>
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                      <div className="flex items-center">
+                        <Bed className="h-4 w-4 mr-1" />
+                        <span>{property.beds} beds</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Bath className="h-4 w-4 mr-1" />
+                        <span>{property.baths} baths</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Square className="h-4 w-4 mr-1" />
+                        <span>{property.sqft.toLocaleString()} sqft</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
