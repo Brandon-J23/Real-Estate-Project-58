@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, Settings, LogOut, BarChart3 } from "lucide-react"
+import { User, Settings, LogOut, HomeIcon } from "lucide-react"
 import Link from "next/link"
 import { useAuth } from "../hooks/useAuth"
 
@@ -60,7 +60,7 @@ export function UserMenu() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dashboard" className="cursor-pointer">
-            <BarChart3 className="mr-2 h-4 w-4" />
+            <HomeIcon className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
