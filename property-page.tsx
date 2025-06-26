@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,10 +11,12 @@ import { Search, Home, TrendingUp, Users, Phone, Mail, Heart, Bed, Bath, Square 
 import Link from "next/link"
 import { useAuth } from "./hooks/useAuth"
 import { UserMenu } from "./components/user-menu"
+import { useRouter } from "next/navigation"
 
 export default function PropertyPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const { user, loading } = useAuth()
+  const router = useRouter()
 
   const quickLocations = ["New York", "Los Angeles", "Chicago", "Miami"]
 
@@ -24,30 +28,10 @@ export default function PropertyPage() {
   ]
 
   const propertyTypes = [
-    {
-      title: "Single Family Homes",
-      count: "2,847 available",
-      type: "single-family",
-      description: "Perfect for families looking for space and privacy",
-    },
-    {
-      title: "Condominiums",
-      count: "1,205 available",
-      type: "condo",
-      description: "Modern living with amenities and convenience",
-    },
-    {
-      title: "Townhouses",
-      count: "892 available",
-      type: "townhouse",
-      description: "The perfect blend of house and condo living",
-    },
-    {
-      title: "Investment Properties",
-      count: "1,234 available",
-      type: "multi-family",
-      description: "Generate income with multi-family properties",
-    },
+    { title: "Single Family Homes", count: "2,847 available" },
+    { title: "Condominiums", count: "1,205 available" },
+    { title: "Townhouses", count: "892 available" },
+    { title: "Investment Properties", count: "1,234 available" },
   ]
 
   const featuredProperties = [
@@ -110,6 +94,20 @@ export default function PropertyPage() {
     },
   ]
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
+    } else {
+      router.push("/search")
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch()
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -126,9 +124,9 @@ export default function PropertyPage() {
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/properties" className="text-blue-600 font-medium">
+              <a href="#" className="text-blue-600 font-medium">
                 Buy
-              </Link>
+              </a>
               <Link href="/sell" className="text-gray-600 hover:text-blue-600 font-medium">
                 Sell
               </Link>
@@ -179,25 +177,31 @@ export default function PropertyPage() {
                 placeholder="Enter location, property type, or keyword..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
                 className="flex-1 h-12 text-base rounded-r-none border-r-0"
               />
-              <Link href={`/properties${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ""}`}>
-                <Button className="h-12 px-8 bg-blue-600 hover:bg-blue-700 rounded-l-none">
-                  <Search className="h-5 w-5 mr-2" />
-                  Search Properties
-                </Button>
-              </Link>
+              <Button onClick={handleSearch} className="h-12 px-8 bg-blue-600 hover:bg-blue-700 rounded-l-none">
+                <Search className="h-5 w-5 mr-2" />
+                Search Properties
+              </Button>
             </div>
           </div>
 
           {/* Quick Location Buttons */}
           <div className="flex flex-wrap justify-center gap-3 mb-12">
             {quickLocations.map((location) => (
-              <Link key={location} href={`/properties?search=${encodeURIComponent(location)}`}>
-                <Button variant="outline" size="sm" className="text-gray-600">
-                  {location}
-                </Button>
-              </Link>
+              <Button
+                key={location}
+                variant="outline"
+                size="sm"
+                className="text-gray-600"
+                onClick={() => {
+                  setSearchQuery(location)
+                  router.push(`/search?q=${encodeURIComponent(location)}`)
+                }}
+              >
+                {location}
+              </Button>
             ))}
           </div>
 
@@ -225,23 +229,30 @@ export default function PropertyPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {propertyTypes.map((type, index) => (
-              <Link key={index} href={`/properties?type=${type.type}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
-                  <div className="h-32 bg-gradient-to-br from-blue-500 to-purple-600 relative">
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="absolute bottom-4 left-4 text-white">
-                      <div className="text-lg font-bold">{type.count.split(" ")[0]}</div>
-                      <div className="text-sm opacity-90">Available</div>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                      {type.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">{type.description}</p>
-                  </CardContent>
-                </Card>
-              </Link>
+              <Card
+                key={index}
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => {
+                  const propertyTypeMap: { [key: string]: string } = {
+                    "Single Family Homes": "Single Family Home",
+                    Condominiums: "Condominium",
+                    Townhouses: "Townhouse",
+                    "Investment Properties": "Multi-Family",
+                  }
+                  const searchType = propertyTypeMap[type.title] || type.title
+                  router.push(`/search?type=${encodeURIComponent(searchType)}`)
+                }}
+              >
+                <div className="h-32 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                  <Home className="h-12 w-12 text-blue-600" />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 transition-colors">
+                    {type.title}
+                  </h3>
+                  <p className="text-sm text-gray-600">{type.count}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -255,7 +266,7 @@ export default function PropertyPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Featured Properties</h2>
               <p className="text-gray-600">Handpicked properties that offer exceptional value and quality</p>
             </div>
-            <Link href="/properties">
+            <Link href="/search">
               <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
                 View All Properties →
               </Button>
@@ -317,7 +328,7 @@ export default function PropertyPage() {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">{service.title}</h3>
                   <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
-                  <Link href={service.title === "Sell Your Property" ? "/sell" : "/properties"}>
+                  <Link href="/sell">
                     <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
                       {service.buttonText}
                     </Button>
@@ -341,15 +352,9 @@ export default function PropertyPage() {
             <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100">
               Schedule Consultation
             </Button>
-            <Link href="/properties">
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-white border-white hover:bg-white hover:text-blue-600"
-              >
-                Browse Properties
-              </Button>
-            </Link>
+            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600">
+              Browse Properties
+            </Button>
           </div>
         </div>
       </section>
@@ -380,14 +385,14 @@ export default function PropertyPage() {
               <h3 className="text-lg font-semibold mb-4">Services</h3>
               <ul className="space-y-2 text-gray-400">
                 <li>
-                  <Link href="/properties" className="hover:text-white">
+                  <a href="#" className="hover:text-white">
                     Buy Property
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link href="/sell" className="hover:text-white">
+                  <a href="#" className="hover:text-white">
                     Sell Property
-                  </Link>
+                  </a>
                 </li>
                 <li>
                   <a href="#" className="hover:text-white">
