@@ -19,6 +19,7 @@ import {
   Bed,
   Bath,
   Square,
+  TrendingUp,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -399,6 +400,21 @@ export default function UserDashboard() {
 
           {/* Favorites Tab */}
           <TabsContent value="favorites" className="space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Your Favorite Properties</h3>
+                <p className="text-gray-600">Properties you've saved for later</p>
+              </div>
+              {mockFavorites.length > 1 && (
+                <Link href="/compare">
+                  <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Compare Properties
+                  </Button>
+                </Link>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {mockFavorites.map((property) => (
                 <Link key={property.id} href={`/property/${property.id}`}>
@@ -437,6 +453,19 @@ export default function UserDashboard() {
                 </Link>
               ))}
             </div>
+
+            {mockFavorites.length === 0 && (
+              <Card>
+                <CardContent className="text-center p-12">
+                  <Heart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No favorites yet</h3>
+                  <p className="text-gray-600 mb-6">Start browsing properties and save your favorites</p>
+                  <Link href="/search">
+                    <Button className="bg-blue-600 hover:bg-blue-700">Browse Properties</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Analytics Tab */}
