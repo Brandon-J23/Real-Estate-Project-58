@@ -125,7 +125,7 @@ export default function PropertyPage() {
             {/* Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               <a href="#" className="text-blue-600 font-medium">
-                Buy
+                Browse
               </a>
               <Link href="/sell" className="text-gray-600 hover:text-blue-600 font-medium">
                 Sell
