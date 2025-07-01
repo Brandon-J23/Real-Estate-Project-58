@@ -128,7 +128,7 @@ export default function PropertyPage() {
                 Browse
               </a>
               <Link href="/sell" className="text-gray-600 hover:text-blue-600 font-medium">
-                Sell
+                Post
               </Link>
               <a href="#" className="text-gray-600 hover:text-blue-600 font-medium">
                 Invest
