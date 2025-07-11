@@ -44,10 +44,30 @@ export default function SignUp() {
     setIsLoading(true)
 
     try {
+      
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
+          //redirect them here after they click the email link:
+          emailRedirectTo: `${window.location.origin}/sign-up-conf`,
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone,
+            user_type: formData.userType,
+            //subscribe_newsletter: formData.subscribeNewsletter,
+          },
+        },
+      })
+      
+      /*
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          // <-- add this:
+          emailRedirectTo: `${window.location.origin}/?confirmed=true`,
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
@@ -55,9 +75,11 @@ export default function SignUp() {
             user_type: formData.userType,
             subscribe_newsletter: formData.subscribeNewsletter,
           },
+          
+          /* emailRedirectTo: `${window.location.origin}/auth/callback`, 
         },
-      })
-
+      })  
+      */
       if (error) {
         console.error("Error signing up:", error.message)
         alert("Error signing up: " + error.message)
@@ -252,18 +274,8 @@ export default function SignUp() {
                     </Link>
                   </Label>
                 </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="newsletter"
-                    checked={formData.subscribeNewsletter}
-                    onCheckedChange={(checked) => handleInputChange("subscribeNewsletter", checked as boolean)}
-                    disabled={isLoading}
-                  />
-                  <Label htmlFor="newsletter" className="text-sm text-gray-600">
-                    Subscribe to our newsletter for market updates and new listings
-                  </Label>
-                </div>
+        
+                
               </div>
 
               <Button
