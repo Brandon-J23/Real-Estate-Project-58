@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -93,6 +95,73 @@ export default function SearchResults() {
   const [sortBy, setSortBy] = useState("Newest First")
   const [showFilters, setShowFilters] = useState(false)
   const [results, setResults] = useState(mockSearchResults)
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
+
+  // Mock search data for live suggestions
+  const mockSearchData = [
+    "Beverly Hills, CA",
+    "Santa Monica, CA",
+    "Malibu, CA",
+    "Hollywood, CA",
+    "Pasadena, CA",
+    "Manhattan Beach, CA",
+    "Venice, CA",
+    "West Hollywood, CA",
+    "Brentwood, CA",
+    "Pacific Palisades, CA",
+    "Single Family Home",
+    "Condominium",
+    "Townhouse",
+    "Luxury Properties",
+    "Oceanview Properties",
+    "Mountain View Properties",
+    "New Construction",
+    "Investment Properties",
+  ]
+
+  // Live search function
+  const performLiveSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+
+    setIsSearching(true)
+
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 200))
+
+    const filtered = mockSearchData.filter((item) => item.toLowerCase().includes(query.toLowerCase())).slice(0, 6)
+
+    setSearchSuggestions(filtered)
+    setShowSuggestions(true)
+    setIsSearching(false)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearchQuery(value)
+    performLiveSearch(value)
+  }
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchQuery(suggestion)
+    setShowSuggestions(false)
+  }
+
+  const handleInputFocus = () => {
+    if (searchQuery.trim()) {
+      performLiveSearch(searchQuery)
+    }
+  }
+
+  const handleInputBlur = () => {
+    // Delay hiding suggestions to allow for clicks
+    setTimeout(() => setShowSuggestions(false), 200)
+  }
 
   // Add useEffect to handle URL parameters
   useEffect(() => {
@@ -258,13 +327,36 @@ export default function SearchResults() {
         <Card className="mb-6">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2 relative">
                 <Input
                   placeholder="Search by location, address, or keyword..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-12"
+                  onChange={handleInputChange}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  className="h-12 pr-10"
                 />
+                {isSearching && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  </div>
+                )}
+
+                {/* Live Search Suggestions */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-b-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                    {searchSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 flex items-center space-x-3"
+                      >
+                        <Search className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-900">{suggestion}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div>
                 <Select value={propertyType} onValueChange={setPropertyType}>

@@ -18,6 +18,84 @@ export default function PropertyPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
 
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
+
+  // Mock search data for live suggestions
+  const mockSearchData = [
+    "Beverly Hills, CA",
+    "Santa Monica, CA",
+    "Malibu, CA",
+    "Hollywood, CA",
+    "Pasadena, CA",
+    "Manhattan Beach, CA",
+    "Venice, CA",
+    "West Hollywood, CA",
+    "Brentwood, CA",
+    "Pacific Palisades, CA",
+    "Single Family Home",
+    "Condominium",
+    "Townhouse",
+    "Luxury Properties",
+    "Oceanview Properties",
+    "Mountain View Properties",
+    "New Construction",
+    "Investment Properties",
+  ]
+
+  // Live search function
+  const performLiveSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+
+    setIsSearching(true)
+
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 200))
+
+    const filtered = mockSearchData.filter((item) => item.toLowerCase().includes(query.toLowerCase())).slice(0, 6)
+
+    setSearchSuggestions(filtered)
+    setShowSuggestions(true)
+    setIsSearching(false)
+  }
+
+  const handleSearch = (selectedQuery?: string) => {
+    const query = selectedQuery || searchQuery
+    if (query.trim()) {
+      router.push(`/search?q=${encodeURIComponent(query)}`)
+    } else {
+      router.push("/search")
+    }
+    setShowSuggestions(false)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearchQuery(value)
+    performLiveSearch(value)
+  }
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchQuery(suggestion)
+    handleSearch(suggestion)
+  }
+
+  const handleInputFocus = () => {
+    if (searchQuery.trim()) {
+      performLiveSearch(searchQuery)
+    }
+  }
+
+  const handleInputBlur = () => {
+    // Delay hiding suggestions to allow for clicks
+    setTimeout(() => setShowSuggestions(false), 200)
+  }
+
   const quickLocations = ["New York", "Los Angeles", "Chicago", "Miami"]
 
   const stats = [
@@ -94,14 +172,6 @@ export default function PropertyPage() {
     },
   ]
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
-    } else {
-      router.push("/search")
-    }
-  }
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleSearch()
@@ -171,16 +241,41 @@ export default function PropertyPage() {
           </p>
 
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto mb-6">
+          <div className="max-w-2xl mx-auto mb-6 relative">
             <div className="flex">
-              <Input
-                placeholder="Enter location, property type, or keyword..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="flex-1 h-12 text-base rounded-r-none border-r-0"
-              />
-              <Button onClick={handleSearch} className="h-12 px-8 bg-blue-600 hover:bg-blue-700 rounded-l-none">
+              <div className="relative flex-1">
+                <Input
+                  placeholder="Enter location, property type, or keyword..."
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  className="flex-1 h-12 text-base rounded-r-none border-r-0 pr-10"
+                />
+                {isSearching && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  </div>
+                )}
+
+                {/* Live Search Suggestions */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-b-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                    {searchSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 flex items-center space-x-3"
+                      >
+                        <Search className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-900">{suggestion}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <Button onClick={() => handleSearch()} className="h-12 px-8 bg-blue-600 hover:bg-blue-700 rounded-l-none">
                 <Search className="h-5 w-5 mr-2" />
                 Search Properties
               </Button>
@@ -194,7 +289,7 @@ export default function PropertyPage() {
                 key={location}
                 variant="outline"
                 size="sm"
-                className="text-gray-600"
+                className="text-gray-600 bg-transparent"
                 onClick={() => {
                   setSearchQuery(location)
                   router.push(`/search?q=${encodeURIComponent(location)}`)
@@ -267,7 +362,7 @@ export default function PropertyPage() {
               <p className="text-gray-600">Handpicked properties that offer exceptional value and quality</p>
             </div>
             <Link href="/search">
-              <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+              <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50 bg-transparent">
                 View All Properties →
               </Button>
             </Link>
@@ -329,7 +424,7 @@ export default function PropertyPage() {
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">{service.title}</h3>
                   <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
                   <Link href="/sell">
-                    <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                    <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50 bg-transparent">
                       {service.buttonText}
                     </Button>
                   </Link>
@@ -352,7 +447,11 @@ export default function PropertyPage() {
             <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100">
               Schedule Consultation
             </Button>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600">
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-white border-white hover:bg-white hover:text-blue-600 bg-transparent"
+            >
               Browse Properties
             </Button>
           </div>
