@@ -24,7 +24,7 @@ export default function PropertyPage() {
 
   // Mock search data for live suggestions
   const mockSearchData = [
-    "Beverly Hills, CA",
+    "Brooklyn, NY",
     "Santa Monica, CA",
     "Malibu, CA",
     "Hollywood, CA",
