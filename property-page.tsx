@@ -29,7 +29,7 @@ export default function PropertyPage() {
     "Malibu, CA",
     "Hollywood, CA",
     "Pasadena, CA",
-    "Manhattan Beach, CA",
+    "Manhattan, NY",
     "Venice, CA",
     "West Hollywood, CA",
     "Brentwood, CA",
