@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Home, TrendingUp, Users, Phone, Mail, Heart, Bed, Bath, Square } from "lucide-react"
+import { Search, Home, TrendingUp, Users, Phone, Mail, Heart, Bed, Bath, Square, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { useAuth } from "./hooks/useAuth"
 import { UserMenu } from "./components/user-menu"
@@ -203,6 +203,9 @@ export default function PropertyPage() {
               <a href="#" className="text-gray-600 hover:text-blue-600 font-medium">
                 Invest
               </a>
+              <Link href="/guide" className="text-gray-600 hover:text-blue-600 font-medium">
+                Guide
+              </Link>
               <a href="#" className="text-gray-600 hover:text-blue-600 font-medium">
                 Contact
               </a>
@@ -283,7 +286,7 @@ export default function PropertyPage() {
           </div>
 
           {/* Quick Location Buttons */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
             {quickLocations.map((location) => (
               <Button
                 key={location}
@@ -298,6 +301,16 @@ export default function PropertyPage() {
                 {location}
               </Button>
             ))}
+          </div>
+
+          {/* Help Link */}
+          <div className="mb-8">
+            <Link href="/guide">
+              <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50 bg-transparent">
+                <BookOpen className="h-4 w-4 mr-2" />
+                Need Help? View User Guide
+              </Button>
+            </Link>
           </div>
 
           {/* Stats */}
@@ -521,9 +534,9 @@ export default function PropertyPage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white">
-                    Careers
-                  </a>
+                  <Link href="/guide" className="hover:text-white">
+                    User Guide
+                  </Link>
                 </li>
                 <li>
                   <a href="#" className="hover:text-white">
