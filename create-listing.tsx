@@ -320,31 +320,27 @@ export default function CreateListing() {
                           <Label htmlFor="city">City</Label>
                           <Input
                             id="city"
-                            placeholder="Los Angeles"
-                            value={formData.city}
-                            onChange={(e) => handleInputChange("city", e.target.value)}
-                            className="mt-1"
+                            value="New York City"
+                            className="mt-1 bg-gray-100"
+                            disabled
+                            readOnly
                           />
                         </div>
                         <div>
                           <Label htmlFor="state">State</Label>
-                          <Select value={formData.state} onValueChange={(value) => handleInputChange("state", value)}>
-                            <SelectTrigger className="mt-1">
-                              <SelectValue placeholder="Select state" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="CA">California</SelectItem>
-                              <SelectItem value="NY">New York</SelectItem>
-                              <SelectItem value="TX">Texas</SelectItem>
-                              <SelectItem value="FL">Florida</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Input
+                            id="state"
+                            value="New York"
+                            className="mt-1 bg-gray-100"
+                            disabled
+                            readOnly
+                          />
                         </div>
                         <div>
                           <Label htmlFor="zipCode">ZIP Code</Label>
                           <Input
                             id="zipCode"
-                            placeholder="90210"
+                            placeholder="10001"
                             value={formData.zipCode}
                             onChange={(e) => handleInputChange("zipCode", e.target.value)}
                             className="mt-1"
