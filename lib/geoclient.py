@@ -5,7 +5,7 @@ import os
 # Load environment variables from .env.local
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
 
-def get_bbl(house_number, street, borough):
+def get_bbl(house_number, street, zip_code):
     url = "https://api.nyc.gov/geoclient/v2/address.json"
     
     # Debug: Check if the API key is loaded
@@ -15,7 +15,7 @@ def get_bbl(house_number, street, borough):
     params = {
         "houseNumber": house_number,
         "street": street,
-        "borough": borough
+        "zip": zip_code
     }
     headers = {
         "Ocp-Apim-Subscription-Key": api_key
@@ -29,18 +29,18 @@ def get_bbl(house_number, street, borough):
         return None
 
 # Example usage
-address_input = input("Enter address (e.g., '123 Broadway Manhattan'): ")
+address_input = input("Enter address (e.g., '123 Broadway 10001'): ")
 parts = address_input.strip().split()
 
 if len(parts) >= 3:
-    # Assume the first part is house number, last part is borough, everything in between is street
+    # Assume the first part is house number, last part is zip code, everything in between is street
     house_number = parts[0]
-    borough = parts[-1]
+    zip_code = parts[-1]
     street = ' '.join(parts[1:-1])  # Join all middle parts as street name
     
-    bbl = get_bbl(house_number, street, borough)
+    bbl = get_bbl(house_number, street, zip_code)
 else:
-    print("Please enter address in the format: house_number street_name borough")
+    print("Please enter address in the format: house_number street_name zip_code")
     bbl = None
 print("BBL:", bbl)
 
