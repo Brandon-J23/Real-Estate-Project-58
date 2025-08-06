@@ -1,6 +1,8 @@
 import requests
 from dotenv import load_dotenv
 import os
+import pandas as pd
+import time
 
 # Load environment variables from .env.local
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
@@ -28,21 +30,60 @@ def get_bbl(house_number, street, zip_code):
         print(f"Error: {response.status_code}, {response.text}")
         return None
 
-# Example usage
-address_input = input("Enter address (e.g., '123 Broadway 10001'): ")
-parts = address_input.strip().split()
+def process_csv_with_bbl(csv_file_path):
+    """
+    Read CSV file, get BBL for each address, and update the CSV with BBL data
+    """
+    try:
+        # Read the CSV file
+        df = pd.read_csv(csv_file_path)
+        print(f"Loaded {len(df)} properties from CSV")
+        
+        # Add an ACRIS link column if it doesn't exist
+        if 'acris_link' not in df.columns:
+            df['acris_link'] = None
+        
+        # Process each row
+        for index, row in df.iterrows():
+            address = str(row['address'])
+            zip_code = str(row['zip_code'])
+            
+            print(f"Processing property {index + 1}/{len(df)}: {address}, {zip_code}")
+            
+            # Parse the address to extract house number and street
+            parts = address.strip().split()
+            if len(parts) >= 2:
+                house_number = parts[0]
+                street = ' '.join(parts[1:])  # Everything after house number is street
+                
+                # Get BBL from API
+                bbl = get_bbl(house_number, street, zip_code)
+                
+                if bbl:
+                    # Create the link to the property information portal
+                    bbl_link = f"https://propertyinformationportal.nyc.gov/parcels/parcel/{bbl}"
+                    df.at[index, 'acris_link'] = bbl_link
+                    print(f"BBL found: {bbl}")
+                    print(f"Link created: {bbl_link}")
+                else:
+                    print("No BBL found")
+            else:
+                print(f"Could not parse address: {address}")
+            
+            # Add delay to respect API rate limits
+            time.sleep(0.5)  # Wait 0.5 seconds between requests
+        
+        # Save the updated CSV
+        df.to_csv(csv_file_path, index=False)
+        print(f"Updated CSV saved to {csv_file_path}")
+        
+    except Exception as e:
+        print(f"Error processing CSV: {e}")
 
-if len(parts) >= 3:
-    # Assume the first part is house number, last part is zip code, everything in between is street
-    house_number = parts[0]
-    zip_code = parts[-1]
-    street = ' '.join(parts[1:-1])  # Join all middle parts as street name
+# Main execution
+if __name__ == "__main__":
+    # Path to the CSV file
+    csv_path = r"C:\Users\jacky\S25Proj\mock_properties.csv"
     
-    bbl = get_bbl(house_number, street, zip_code)
-else:
-    print("Please enter address in the format: house_number street_name zip_code")
-    bbl = None
-print("BBL:", bbl)
-
-if bbl:
-    print("https://propertyinformationportal.nyc.gov/parcels/parcel/" + str(bbl))
+    print("Starting BBL processing for mock_properties.csv...")
+    process_csv_with_bbl(csv_path)

@@ -195,6 +195,14 @@ export default function CreateListing() {
   }
 
   const nextStep = () => {
+    // Validation for Step 1 (Property Details)
+    if (currentStep === 0) {
+      if (!formData.address.trim() || !formData.zipCode.trim()) {
+        alert("Please fill in both the Property Address and ZIP Code before proceeding.")
+        return
+      }
+    }
+    
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1)
     }
@@ -806,7 +814,12 @@ export default function CreateListing() {
                   </Button>
 
                   {currentStep < steps.length - 1 ? (
-                    <Button onClick={nextStep}>Next</Button>
+                    <Button 
+                      onClick={nextStep}
+                      disabled={currentStep === 0 && (!formData.address.trim() || !formData.zipCode.trim())}
+                    >
+                      Next
+                    </Button>
                   ) : (
                     <Button onClick={handleSubmit} disabled={isSubmitting}>
                       {isSubmitting ? (
