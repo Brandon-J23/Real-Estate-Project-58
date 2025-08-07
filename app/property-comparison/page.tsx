@@ -4,7 +4,10 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-//testing
+//Dont forget in the property page.tsx you add this:<Link href="/property-comparison" className="text-gray-600 hover:text-purple-600 font-medium">
+              //   Compare Properties
+              // </Link>
+            // This is the part of the code that adds another button to the webpage
 const mockProperties = [
   {
     id: 1,
